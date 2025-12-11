@@ -1,0 +1,115 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  --animate-shake: shake 0.5s ease-in-out infinite;
+  --animate-bounce-slow: bounce 1s ease-in-out infinite;
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
+  --animate-confetti: confetti 1s ease-out forwards;
+  --animate-reveal: reveal 0.8s ease-out forwards;
+
+  @keyframes shake {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(251, 146, 60, 0.5); }
+    50% { box-shadow: 0 0 40px rgba(251, 146, 60, 0.8); }
+  }
+
+  @keyframes confetti {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+  }
+
+  @keyframes reveal {
+    0% { transform: scale(0.5) rotateY(180deg); opacity: 0; }
+    100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+  }
+}
+
+/* DaisyUI Theme */
+@plugin "daisyui" {
+  themes: givt --default;
+}
+
+@plugin "daisyui/theme" {
+  name: "givt";
+  default: true;
+  --color-base-100: #fef7f7;
+  --color-base-200: #fef2f2;
+  --color-base-300: #fee2e2;
+  --color-base-content: #1f2937;
+  --color-primary: #e11d48;
+  --color-primary-content: #ffffff;
+  --color-secondary: #059669;
+  --color-secondary-content: #ffffff;
+  --color-accent: #f59e0b;
+  --color-accent-content: #ffffff;
+  --color-neutral: #374151;
+  --color-neutral-content: #ffffff;
+  --color-info: #3b82f6;
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+  --color-error: #ef4444;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+/* Gift Box Animations */
+.gift-box {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.gift-box.shaking {
+  animation: shake 0.15s ease-in-out infinite;
+}
+
+.gift-box-lid {
+  transform-origin: bottom center;
+  transition: transform 0.5s ease-out;
+}
+
+.gift-box.opened .gift-box-lid {
+  transform: rotateX(-110deg) translateY(-20px);
+}
+
+/* Confetti */
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  animation: confetti-fall 3s ease-out forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(400px) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Card hover effects */
+.participant-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.participant-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+}
