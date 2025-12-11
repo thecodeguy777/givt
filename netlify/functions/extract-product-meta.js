@@ -34,6 +34,32 @@ exports.handler = async function(event) {
       }
     }
 
+    // Extract data from URL parameters as fallback (Lazada includes useful data in URL)
+    const urlParams = Object.fromEntries(urlObj.searchParams)
+    let urlPrice = null
+    let urlTitle = null
+
+    // Lazada URL often contains price parameter
+    if (urlParams.price) {
+      urlPrice = parseFloat(urlParams.price)
+    }
+
+    // Try to extract product name from clickTrackInfo
+    if (urlParams.clickTrackInfo) {
+      const decoded = decodeURIComponent(urlParams.clickTrackInfo)
+      const queryMatch = decoded.match(/query%3A([^%]+)%3B/) || decoded.match(/query:([^;]+);/)
+      if (queryMatch) {
+        urlTitle = decodeURIComponent(queryMatch[1]).replace(/\+/g, ' ')
+      }
+    }
+
+    // Extract product ID from pathname for better title
+    const pathMatch = urlObj.pathname.match(/\/products\/([^\/]+)-i(\d+)/)
+    let productSlug = null
+    if (pathMatch) {
+      productSlug = pathMatch[1].replace(/-/g, ' ')
+    }
+
     // Fetch the page with browser-like headers
     const response = await fetch(url, {
       headers: {
@@ -135,10 +161,28 @@ exports.handler = async function(event) {
     // Determine source
     const source = urlObj.hostname.includes('lazada') ? 'lazada' : 'shopee'
 
+    // Use URL-extracted data as fallbacks
+    // Priority: HTML extracted > URL params > slug from path
+    let finalTitle = title
+    if (!finalTitle || finalTitle === 'Unknown Product') {
+      finalTitle = productSlug || urlTitle || 'Unknown Product'
+    }
+
+    // Capitalize first letter of each word for slug-based titles
+    if (finalTitle && finalTitle === productSlug) {
+      finalTitle = finalTitle
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ')
+    }
+
+    // Use URL price as fallback
+    const finalPrice = price || urlPrice
+
     const result = {
-      title: title || 'Unknown Product',
+      title: finalTitle,
       imageUrl: imageUrl || null,
-      price: price,
+      price: finalPrice,
       currency: currency,
       source: source,
       url: url,
