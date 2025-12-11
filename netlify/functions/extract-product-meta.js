@@ -1,7 +1,7 @@
 // Netlify function to extract product metadata from Lazada/Shopee URLs
 // This runs server-side to avoid CORS issues
 
-export async function handler(event) {
+exports.handler = async function(event) {
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {

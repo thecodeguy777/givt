@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useParty } from '@/composables/useParty'
 import { useWishlist } from '@/composables/useWishlist'
@@ -22,7 +22,10 @@ async function loadData() {
   const { data } = await fetchParty(partyId.value)
   if (data) {
     party.value = data
-    await fetchItems()
+    // Only fetch items if user is loaded
+    if (userStore.user) {
+      await fetchItems()
+    }
   }
 }
 
@@ -30,6 +33,8 @@ async function handleAddItem(item) {
   const { error } = await addItem(item)
   if (!error) {
     showAddModal.value = false
+    // Refresh the list after adding
+    await fetchItems()
   }
 }
 
@@ -45,6 +50,13 @@ function formatBudget(amount) {
     minimumFractionDigits: 0,
   }).format(amount)
 }
+
+// Watch for user to be ready, then fetch wishlist
+watch(() => userStore.user, async (newUser) => {
+  if (newUser && party.value) {
+    await fetchItems()
+  }
+}, { immediate: false })
 
 onMounted(loadData)
 </script>
